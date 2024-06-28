@@ -1,0 +1,23 @@
+{
+  "name": "xml-memorial",
+  "version": "1.0.0-DEADSHOT",
+  "description": "XML memorial for old technology that will haunt you for the rest of your life.",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "test"
+  },
+  "keywords": [
+    "XML",
+    "XSL",
+    "XSD",
+    "XD"
+  ],
+  "author": "37dmk",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.0",
+    "xsd-schema-validator": "^0.9.0"
+  }
+}

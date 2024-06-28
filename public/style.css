@@ -1,0 +1,39 @@
+* {
+    box-sizing: border-box;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Gill', 'Gill Sans', 'Trebuchet MS', sans-serif;
+    font-size: 16px;
+}
+table {
+    border-collapse: collapse;
+}
+tr:nth-child(2n) {
+    background-color: #33333344;
+}
+td, th {
+    padding: 0.3rem 1.6rem 0.4rem 0.4rem;
+}
+th {
+    border-bottom: 1px solid #333;
+    text-align: left;
+}
+td {
+    background-color: #3333331e;
+    text-align: right;
+}
+.main-container {
+    min-height: 100%;
+    padding: 1px 2.4rem;
+    max-width: 54rem;
+    margin: 0 auto;
+}
+.labelgroup {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    margin-bottom: 0.5rem;
+}

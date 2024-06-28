@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="asset">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="title" type="xs:string" />
+                <!-- following is a restricted value -->
+                <xs:element name="risk">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:double">
+                            <xs:minExclusive value="0" />
+                            <xs:maxExclusive value="1" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="related" type="xs:string" minOccurs="0" />
+                <xs:element name="compare" type="xs:string" minOccurs="0" default="USD" />
+                <!-- following is an enum -->
+                <xs:element name="assetClass">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="STOCK" />
+                            <xs:enumeration value="CRYPTO" />
+                            <xs:enumeration value="BOND" />
+                            <xs:enumeration value="OPTION" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="trades" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="trade" type="tradeCicle" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- complex types that can be used in main element -->
+    <xs:complexType name="tradeCicle">
+        <xs:sequence>
+            <xs:element name="acquisition" type="datePrice" />
+            <xs:element name="liquidation" type="datePrice" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" use="required" />
+    </xs:complexType>
+    <xs:complexType name="datePrice">
+        <xs:sequence>
+            <xs:element name="date" type="xs:date" />
+            <xs:element name="price">
+                <xs:simpleType>
+                    <xs:restriction base="xs:double">
+                        <xs:minInclusive value="0" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

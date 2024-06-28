@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>XML Memorial</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="main-container">
+        <h1>XML Memorial</h1>
+        <p>This is a memorial application for XML format.</p>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="labelgroup">
+                <label for="xmlmemory">XML file:</label>
+                <input name="xmlmemory" type="file" />
+            </div>
+            <div class="labelgroup">
+                <label></label>
+                <input id="validate" type="submit" name="validate" value="validate" />
+            </div>
+            <div>
+                <code id="output"></code>
+            </div>
+        </form>
+    </div>
+    <script>
+        const errorSplitString = '~|~';
+
+        const getParams = () => {
+            let parameterlist = window.location.search.substring(1).split("&");
+            parameterlist = parameterlist.filter(string => string !== '')
+            .map(pairString => {
+                let strings = pairString.split("=");
+                let pair = {};
+                const key = strings[0];
+                let value = true;
+                const decoded = (strings[1]) ? decodeURIComponent(strings[1]) : '';
+                value = (decoded.includes(errorSplitString)) ? decoded.split(errorSplitString) : decoded;
+                value = (value === 'true') ? true : value;
+                pair[key] = value;
+                console.log(pair);
+                return pair
+            })
+            return parameterlist;
+        }
+
+        const params = getParams();
+        params.forEach(param => {
+            const keys = Object.keys(param);
+            const span = document.createElement('span');
+            const newline = document.createElement('br');
+            const value = (Array.isArray(param[keys[0]])) ? param[keys[0]].join(', ') : param[keys[0]];
+            const text = document.createTextNode(`${keys[0]}: ${decodeURIComponent(value)}`);
+            span.appendChild(text);
+            output.appendChild(span);
+            output.appendChild(newline);
+        })
+        console.debug(params);
+    </script>
+</body>
+</html>
