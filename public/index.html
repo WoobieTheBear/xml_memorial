@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,13 +10,14 @@
     <div class="main-container">
         <h1>XML Memorial</h1>
         <p>This is a memorial application for XML format.</p>
+        <p>To watch the output of an xsl file transforming xml into a webpage click <a href="memory-upload.xml">here</a></p>
         <form action="/upload" method="POST" enctype="multipart/form-data">
             <div class="labelgroup">
                 <label for="xmlmemory">XML file:</label>
                 <input name="xmlmemory" type="file" />
             </div>
             <div class="labelgroup">
-                <label></label>
+                <span></span>
                 <input id="validate" type="submit" name="validate" value="validate" />
             </div>
         </form>

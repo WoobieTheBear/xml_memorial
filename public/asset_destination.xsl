@@ -10,7 +10,8 @@
 </head>
 <body>
     <div class="main-container">
-        <h1>Asset</h1>        
+        <h1>Asset</h1>
+        <p>To go back to validation click <a href="/">here</a></p>
         <table>
             <thead>
                 <tr>
