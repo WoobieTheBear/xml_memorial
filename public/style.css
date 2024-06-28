@@ -40,3 +40,6 @@ code {
     grid-template-columns: 8rem 1fr;
     margin-bottom: 0.8rem;
 }
+[type="submit"] {
+    max-width: 6.1rem;
+}

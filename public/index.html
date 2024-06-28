@@ -11,10 +11,10 @@
         <h1>XML Memorial</h1>
         <p>This is a memorial application for XML format.</p>
         <p>To watch the output of an xsl file transforming xml into a webpage click <a href="memory-upload.xml">here</a></p>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
+        <form id="xmlValidation" action="/upload" method="POST" enctype="multipart/form-data">
             <div class="labelgroup">
                 <label for="xmlmemory">XML file:</label>
-                <input name="xmlmemory" type="file" />
+                <input id="xmlmemory" name="xmlmemory" type="file" />
             </div>
             <div class="labelgroup">
                 <span></span>
@@ -27,49 +27,34 @@
     </div>
     <script>
         // this is a poor mans solution so i do not have to requests async
-        const errorSplitString = '~';
-
-        const getParams = () => {
-            let parameterlist = window.location.search.substring(1).split("&");
-            parameterlist = parameterlist.filter(string => string !== '')
-            .map(pairString => {
-                let strings = pairString.split("=");
-                let pair = {};
-                const key = strings[0];
-                let value = true;
-                const decoded = (strings[1]) ? decodeURIComponent(strings[1]) : '';
-                value = (decoded.includes(errorSplitString)) ? decoded.split(errorSplitString) : decoded;
-                value = (value === 'true') ? true : value;
-                pair[key] = value;
-                console.log(pair);
-                return pair
+        xmlValidation.onsubmit = async (evt) => {
+            evt.preventDefault();
+            var data = new FormData();
+            data.append('xmlmemory', xmlmemory.files[0]);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: data,
+            }).then(res => res.json());
+            output.innerHTML = '';
+            Object.keys(response).forEach(key => {
+                const codeKey = document.createElement('code');
+                const textKey = document.createTextNode(`${key}:`);
+                codeKey.appendChild(textKey);
+                output.appendChild(codeKey);
+                
+                const valuesDiv = document.createElement('div');
+                const values = (Array.isArray(response[key])) ? response[key] : [ response[key] ];
+                for(const value of values) {
+                    const valueLine = document.createElement('br');
+                    const codeValue = document.createElement('code');
+                    const textValue = document.createTextNode(value);
+                    codeValue.appendChild(textValue);
+                    valuesDiv.appendChild(codeValue);
+                    valuesDiv.appendChild(valueLine);
+                }
+                output.appendChild(valuesDiv);
             })
-            return parameterlist;
         }
-
-        const params = getParams();
-        params.forEach(param => {
-            const keys = Object.keys(param);
-
-            const key = keys[0];
-            const codeKey = document.createElement('code');
-            const textKey = document.createTextNode(`${key}:`);
-            codeKey.appendChild(textKey);
-            output.appendChild(codeKey);
-            
-            const valuesDiv = document.createElement('div');
-            const values = (Array.isArray(param[keys[0]])) ? param[keys[0]] : [ param[keys[0]] ];
-            for(const value of values) {
-                const valueLine = document.createElement('br');
-                const codeValue = document.createElement('code');
-                const textValue = document.createTextNode(value);
-                codeValue.appendChild(textValue);
-                valuesDiv.appendChild(codeValue);
-                valuesDiv.appendChild(valueLine);
-            }
-            output.appendChild(valuesDiv);
-        })
-        console.debug(params);
     </script>
 </body>
 </html>

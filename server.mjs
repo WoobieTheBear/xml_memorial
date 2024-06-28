@@ -4,7 +4,6 @@ import validator from 'xsd-schema-validator';
 
 const PORT = 1337;
 const definitionFilePath = './public/asset_definition.xsd';
-const errorSplitString = '~';
 
 const app = express();
 app.use(express.static('public'));
@@ -42,12 +41,7 @@ app.post('/upload', async (req, res) => {
             console.error(`Validation result: ${error.result}`);
         }
         console.log(response);
-        let redirect = '/';
-        if (response) {
-            redirect += `?valid=${response.valid}&result=${response.result}&messages=${response.messages.join(errorSplitString)}`;
-        }
-    
-        res.redirect(redirect);
+        res.send(response);
     } else {
         res.redirect(`/?valid=${false}&result=no xml file&messages=please go play with something shiny for a while`);
     }
