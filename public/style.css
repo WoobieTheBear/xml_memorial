@@ -26,6 +26,9 @@ td {
     background-color: #3333331e;
     text-align: right;
 }
+code {
+    font-size: 0.8rem;
+}
 .main-container {
     min-height: 100%;
     padding: 1px 2.4rem;
@@ -34,6 +37,6 @@ td {
 }
 .labelgroup {
     display: grid;
-    grid-template-columns: 12rem 1fr;
-    margin-bottom: 0.5rem;
+    grid-template-columns: 8rem 1fr;
+    margin-bottom: 0.8rem;
 }

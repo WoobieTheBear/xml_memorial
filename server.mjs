@@ -3,45 +3,54 @@ import fileUpload from 'express-fileupload';
 import validator from 'xsd-schema-validator';
 
 const PORT = 1337;
-const memoryFilePath = './public/memory-upload.xml';
 const definitionFilePath = './public/asset_definition.xsd';
-const errorSplitString = '~|~';
+const errorSplitString = '~';
 
 const app = express();
 app.use(express.static('public'));
 
 app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
+    files: 1,
 }));
 
 app.post('/upload', async (req, res) => {
+    console.debug('/upload');
     // the uploaded file object
     const {files: { xmlmemory }} = req;
-    await xmlmemory.mv(memoryFilePath, (err) => {
-        // the file could not be saved for some reason
-        if (err) return res.status(500).send(err);
-    });
-    let response = false;
-    try {
-        response = await validator.validateXML(xmlmemory.data.toString(), definitionFilePath, 
-        (error, result) => {
-            if (error) {
-                console.error(error);
-            };
-            return result;
+    const incoming = xmlmemory.name.split('.');
+    const fileExtension = incoming[incoming.length - 1];
+    if (fileExtension === 'xml') {
+        const filepath = `./public/memory-upload.${fileExtension}`;
+        await xmlmemory.mv(filepath, (err) => {
+            // the file could not be saved for some reason
+            if (err) return res.status(500).send(err);
         });
-    } catch (error) {
-        const {valid, result, messages} = error;
-        response = { valid: valid, result: result, messages: messages };
-        console.error(error);
+        let response = false;
+        try {
+            response = await validator.validateXML(xmlmemory.data.toString(), definitionFilePath, 
+            (error, result) => {
+                if (error) {
+                    console.error(error);
+                };
+                return result;
+            });
+        } catch (error) {
+            const {valid, result, messages} = error;
+            const uniqueMessages = messages.filter((message, index, list) => list.indexOf(message) === index);
+            response = { valid: valid, result: result, messages: uniqueMessages };
+            console.error(`Validation result: ${error.result}`);
+        }
+        console.log(response);
+        let redirect = '/';
+        if (response) {
+            redirect += `?valid=${response.valid}&result=${response.result}&messages=${response.messages.join(errorSplitString)}`;
+        }
+    
+        res.redirect(redirect);
+    } else {
+        res.redirect(`/?valid=${false}&result=no xml file&messages=please go play with something shiny for a while`);
     }
-    console.log(response);
-    let redirect = '/';
-    if (response) {
-        redirect += `?valid=${response.valid}&result=${response.result}&messages=${response.messages.join(errorSplitString)}`;
-    }
-
-    res.redirect(redirect);
 });
 
 app.listen(PORT, () => {

@@ -19,13 +19,14 @@
                 <label></label>
                 <input id="validate" type="submit" name="validate" value="validate" />
             </div>
-            <div>
-                <code id="output"></code>
-            </div>
         </form>
+        <div>
+            <div id="output" class="labelgroup"></div>
+        </div>
     </div>
     <script>
-        const errorSplitString = '~|~';
+        // this is a poor mans solution so i do not have to requests async
+        const errorSplitString = '~';
 
         const getParams = () => {
             let parameterlist = window.location.search.substring(1).split("&");
@@ -48,13 +49,24 @@
         const params = getParams();
         params.forEach(param => {
             const keys = Object.keys(param);
-            const span = document.createElement('span');
-            const newline = document.createElement('br');
-            const value = (Array.isArray(param[keys[0]])) ? param[keys[0]].join(', ') : param[keys[0]];
-            const text = document.createTextNode(`${keys[0]}: ${decodeURIComponent(value)}`);
-            span.appendChild(text);
-            output.appendChild(span);
-            output.appendChild(newline);
+
+            const key = keys[0];
+            const codeKey = document.createElement('code');
+            const textKey = document.createTextNode(`${key}:`);
+            codeKey.appendChild(textKey);
+            output.appendChild(codeKey);
+            
+            const valuesDiv = document.createElement('div');
+            const values = (Array.isArray(param[keys[0]])) ? param[keys[0]] : [ param[keys[0]] ];
+            for(const value of values) {
+                const valueLine = document.createElement('br');
+                const codeValue = document.createElement('code');
+                const textValue = document.createTextNode(value);
+                codeValue.appendChild(textValue);
+                valuesDiv.appendChild(codeValue);
+                valuesDiv.appendChild(valueLine);
+            }
+            output.appendChild(valuesDiv);
         })
         console.debug(params);
     </script>

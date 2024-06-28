@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="asset_destination.xsl" ?>
+<asset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="asset_definition.xsd">
+    <title>USDBTC</title>
+    <risk>0.8</risk>
+    <related>ETHUSD</related>
+    <assetClass>STOCK</assetClass>
+    <trades>
+        <trade>
+            <acquisition>
+                <date>2004-08-24</date>
+                <price>2240.45</price>
+            </acquisition>
+            <liquidation>
+                <date>2012-08-24</date>
+                <price>4233.45</price>
+            </liquidation>
+        </trade>
+        <trade id="eeff0001">
+            <acquisition>
+                <date>2024-08-24</date>
+                <price>45340.45</price>
+            </acquisition>
+            <liquidation>
+                <date>2025-08-24</date>
+                <price>150233.45</price>
+            </liquidation>
+        </trade>
+        <trade id="eeff0002">
+            <acquisition>
+                <date>2024-08-28</date>
+                <price>48340.65</price>
+            </acquisition>
+        </trade>
+    </trades>
+</asset>
