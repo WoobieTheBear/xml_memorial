@@ -2,191 +2,105 @@ let _order = 1;
 
 export function toXml(xmlString) {
   "use strict";
-  const openBracket = "<";
-  const openBracketCC = "<".charCodeAt(0);
-  const closeBracket = ">";
-  const closeBracketCC = ">".charCodeAt(0);
-  const minusCC = "-".charCodeAt(0);
-  const slashCC = "/".charCodeAt(0);
-  const exclamationCC = "!".charCodeAt(0);
-  const singleQuoteCC = "'".charCodeAt(0);
-  const doubleQuoteCC = '"'.charCodeAt(0);
-  const questionMarkCC = "?".charCodeAt(0);
-
-  /**
-   * returns text until the first nonAlphabetic letter
-   */
-  const nameSpacer = "\r\n\t>/= ";
-
   let pos = 0;
-  let startNamePos = pos;
-	let startTextPos = pos;
-	let startStringPos = pos;
-	let charCode = -1;
-	let attrFound = false;
-	let text = '';
-	let startChar = '';
-	let propertyName = '';
-	let propertyValue = '';
-	let nodeTagName = '';
-	let nodeAttributes = {};
-	let nodeChildren = [];
+  _order = 1; 
 
-	const upperCaseAtoZ = (charCode) => {
-		return charCode > 64 && charCode < 91;
-	}
+  const openBracket = "<";
+  const closeBracket = ">";
+  // Added \s to nameSpacer to handle spaces between attributes better
+  const nameSpacer = "\r\n\t >/= ";
 
-	const lowerCaseAtoZ = (charCode) => {
-		return charCode > 96 && charCode < 123;
-	}
-  /**
-   * Parsing a list of entries
-   */
-  function parseChildren() {
-    const children = [];
+  function parse() {
+    const nodes = [];
 
-    while (xmlString[pos]) {
-      if (xmlString.charCodeAt(pos) == openBracketCC) {
-        if (xmlString.charCodeAt(pos + 1) === slashCC) { // </
-          // while (S[pos]!=='>') { pos++; }
-          pos = xmlString.indexOf(closeBracket, pos);
-          return children;
-        } else if (xmlString.charCodeAt(pos + 1) === exclamationCC) {
-          // <! or <!--
-          if (xmlString.charCodeAt(pos + 2) == minusCC) {
-            // comment support
-            while (
-              !(
-                xmlString.charCodeAt(pos) === closeBracketCC &&
-                xmlString.charCodeAt(pos - 1) === minusCC &&
-                xmlString.charCodeAt(pos - 2) === minusCC &&
-                pos !== -1
-              )
-            ) {
-              pos = xmlString.indexOf(closeBracket, pos + 1);
-            }
-            if (pos === -1) {
-              pos = xmlString.length;
-            }
-          } else {
-            // doctype support
-            pos += 2;
-            for (; xmlString.charCodeAt(pos) !== closeBracketCC; pos++) {}
-          }
-          pos++;
-          continue;
-        } else if (xmlString.charCodeAt(pos + 1) === questionMarkCC) {
-          // <?
-          // XML header support
-          pos = xmlString.indexOf(closeBracket, pos);
-          pos++;
-          continue;
-        }
-        pos++;
-        startNamePos = pos;
-        for (; nameSpacer.indexOf(xmlString[pos]) === -1; pos++) {}
-        nodeTagName = xmlString.slice(startNamePos, pos);
+    while (pos < xmlString.length) {
+      const nextOpen = xmlString.indexOf(openBracket, pos);
 
-        // Parsing attributes
-        attrFound = false;
-        nodeAttributes = {};
-        for (; xmlString.charCodeAt(pos) !== closeBracketCC; pos++) {
-          charCode = xmlString.charCodeAt(pos);
-          if (upperCaseAtoZ(charCode) || lowerCaseAtoZ(charCode)) {
-            startNamePos = pos;
-            for (; nameSpacer.indexOf(xmlString[pos]) === -1; pos++) {}
-            propertyName = xmlString.slice(startNamePos, pos);
-
-						// search beginning of the string
-            var code = xmlString.charCodeAt(pos);
-            while (code !== singleQuoteCC && code !== doubleQuoteCC) {
-              pos++;
-              code = xmlString.charCodeAt(pos);
-            }
-
-            startChar = xmlString[pos];
-            startStringPos = ++pos;
-            pos = xmlString.indexOf(startChar, startStringPos);
-            propertyValue = xmlString.slice(startStringPos, pos);
-            if (!attrFound) {
-              nodeAttributes = {};
-              attrFound = true;
-            }
-            nodeAttributes[propertyName] = propertyValue;
-          }
-        }
-
-        // Optional parsing of children
-        if (xmlString.charCodeAt(pos - 1) !== slashCC) {
-          pos++;
-          nodeChildren = parseChildren();
-        }
-
-        children.push({
-          children: nodeChildren,
-          tagName: nodeTagName,
-          attrs: nodeAttributes,
-        });
-      } else {
-        startTextPos = pos;
-				// Skip characters until '<'
-        pos = xmlString.indexOf(openBracket, pos) - 1;
-        if (pos === -2) {
-          pos = xmlString.length;
-        }
-        text = xmlString.slice(startTextPos, pos + 1);
+      // 1. HANDLE TEXT CONTENT (Preserving intentional spaces)
+      if (nextOpen > pos || nextOpen === -1) {
+        let textEnd = nextOpen === -1 ? xmlString.length : nextOpen;
+        let text = xmlString.slice(pos, textEnd);
+        
+        // If it's not just empty whitespace, keep it (including trailing spaces!)
         if (text.trim().length > 0) {
-          children.push(text);
+          nodes.push(text); 
         }
-      }
-      pos++;
-    }
-    return children;
-  }
-
-  _order = 1;
-  return simplify(parseChildren());
-}
-
-function simplify(children) {
-  let node = {};
-
-  if (typeof children === 'undefined') {
-    return {};
-  }
-
-  // Text node (e.g. <t>This is text.</t>)
-  if (children.length === 1 && typeof children[0] == "string") {
-    return children[0];
-  }
-
-  // map each object
-  children.forEach(function (child) {
-    if (!node[child.tagName]) {
-      node[child.tagName] = [];
-    }
-
-    if (typeof child === "object") {
-      var kids = simplify(child.children);
-      if (child.attrs) {
-        kids.attrs = child.attrs;
+        pos = textEnd;
+        if (nextOpen === -1) break;
       }
 
-      if (kids["attrs"] === undefined) {
-        kids["attrs"] = { order: _order };
-      } else {
-        kids["attrs"]["order"] = _order;
+      // 2. HANDLE CLOSING TAGS (Stop recursion)
+      if (xmlString[pos + 1] === "/") {
+        pos = xmlString.indexOf(closeBracket, pos) + 1;
+        if (pos === 0) pos = xmlString.length; // Safety break
+        return nodes; 
       }
-      _order++;
-      node[child.tagName].push(kids);
-    }
-  });
 
-  for (var i in node) {
-    if (node[i].length == 1) {
-      node[i] = node[i][0];
+      // 3. HANDLE COMMENTS / DOCTYPE / PROLOG
+      if (xmlString[pos + 1] === "!" || xmlString[pos + 1] === "?") {
+        let nextClose = xmlString.indexOf(closeBracket, pos);
+        pos = (nextClose === -1) ? xmlString.length : nextClose + 1;
+        continue;
+      }
+
+      // 4. HANDLE OPENING TAGS
+      pos++; // Move past '<'
+      let startName = pos;
+      while (pos < xmlString.length && nameSpacer.indexOf(xmlString[pos]) === -1) {
+        pos++;
+      }
+      let tagName = xmlString.slice(startName, pos);
+
+      // --- PARSE ATTRIBUTES ---
+      let properties = {};
+      while (pos < xmlString.length && xmlString[pos] !== closeBracket && xmlString[pos] !== "/") {
+        let char = xmlString[pos];
+        // If it's an alphanumeric start of an attribute name
+        if (/[a-zA-Z0-9]/.test(char)) {
+          let startAttr = pos;
+          while (pos < xmlString.length && nameSpacer.indexOf(xmlString[pos]) === -1) pos++;
+          let attrName = xmlString.slice(startAttr, pos);
+          
+          // Move to the quote after '='
+          let startQuote = xmlString.indexOf('"', pos);
+          let startQuoteAlt = xmlString.indexOf("'", pos);
+          
+          // Pick the closest quote
+          let quoteType = (startQuote !== -1 && (startQuote < startQuoteAlt || startQuoteAlt === -1)) ? '"' : "'";
+          let quotePos = xmlString.indexOf(quoteType, pos);
+          
+          if (quotePos !== -1) {
+            let startVal = quotePos + 1;
+            let endVal = xmlString.indexOf(quoteType, startVal);
+            if (endVal !== -1) {
+              properties[attrName] = xmlString.slice(startVal, endVal);
+              pos = endVal + 1;
+              continue;
+            }
+          }
+        }
+        pos++; // Keep moving if no attribute match
+      }
+
+      const isSelfClosing = xmlString[pos] === "/";
+      
+      // Move past the closing '>'
+      let endOfTag = xmlString.indexOf(closeBracket, pos);
+      pos = (endOfTag === -1) ? xmlString.length : endOfTag + 1;
+
+      // 5. CREATE THE NODE
+      const node = {
+        tagName: tagName,
+        properties: properties,
+        order: _order++,
+        content: isSelfClosing ? [] : parse() 
+      };
+
+      nodes.push(node);
     }
+    return nodes;
   }
 
-  return node;
+  const result = parse();
+  return Array.isArray(result) && result.length === 1 ? result[0] : result;
 }

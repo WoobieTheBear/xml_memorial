@@ -9,11 +9,18 @@ XML was created back in a time when computer scientists had actual jobs and did 
 
 ## Setup Description
 
-1. Install [node.js](https://nodejs.org/en)
+1. Install [colima](https://github.com/abiosoft/colima)
 2. Clone repository
 3. Go to repository folder
 4. Open Command line by typing `cmd` into your explorer search bar
-5. Enter the magic words `npm install`
+5. Enter the magic words
+```bash
+colima start
+docker-compose -f ./docker/docker-compose.yml up
+# look up localhost:1337 in a browser to visit the page
+# when you are done call
+docker-compose -f ./docker/docker-compose.yml down --volumes --remove-orphans
+```
 6. Watch the funny command line output saying that there was a lot of things done and installed that you have no clue what it means
 7. Enter the magic words `npm start`
 8. Open a browser and enter [`localhost:1337/asset.xml`](http://localhost:1337/asset.xml)

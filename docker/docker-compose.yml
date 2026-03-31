@@ -3,6 +3,7 @@ services:
     build:
       context: ..          # This is correct; it looks at the project root
       dockerfile: docker/Dockerfile
+    container_name: xmlmemorial
     volumes:
       - ../src:/usr/src/app # Changed to ../src to map your code correctly
       - /usr/src/app/node_modules # Prevents host node_modules from overwriting container
