@@ -9,7 +9,8 @@ XML was created back in a time when computer scientists had actual jobs and did 
 
 ## Setup Description
 
-1. Install [colima](https://github.com/abiosoft/colima)
+0. Install [chocolatey](https://chocolatey.org/install) or [brew](https://brew.sh/) 
+1. Install [colima](https://github.com/abiosoft/colima) via choco install or brew install
 2. Clone repository
 3. Go to repository folder
 4. Open Command line by typing `cmd` into your explorer search bar
@@ -21,10 +22,8 @@ docker-compose -f ./docker/docker-compose.yml up
 # when you are done call
 docker-compose -f ./docker/docker-compose.yml down --volumes --remove-orphans
 ```
-6. Watch the funny command line output saying that there was a lot of things done and installed that you have no clue what it means
-7. Enter the magic words `npm start`
-8. Open a browser and enter [`localhost:1337/asset.xml`](http://localhost:1337/asset.xml)
-9. Congratulations, you are now a hackerman, now go out into the wild and make autistic remarks at how sad our life and how morally twisted our society is
+6. Open a browser and enter [`localhost:1337/asset.xml`](http://localhost:1337/asset.xml)
+7. Congratulations, you are now a hackerman, now go out into the wild and make autistic remarks at how sad our life and how morally twisted our society is
 
 
 ## XPath information
