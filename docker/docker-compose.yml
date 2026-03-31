@@ -1,0 +1,16 @@
+services:
+  xmlmemorial:
+    build:
+      context: ..          # This is correct; it looks at the project root
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../src:/usr/src/app # Changed to ../src to map your code correctly
+      - /usr/src/app/node_modules # Prevents host node_modules from overwriting container
+    environment:
+      - NODE_ENV=development
+    tty: true 
+    stdin_open: true
+    ports:
+      - 1337:1337
+    working_dir: /usr/src/app
+    entrypoint: npm start
