@@ -9,12 +9,13 @@ export function toXml(xmlString) {
   const closeBracket = ">";
   // Added \s to nameSpacer to handle spaces between attributes better
   const nameSpacer = "\r\n\t >/= ";
+  let nextOpen = -1;
 
   function parse() {
     const nodes = [];
 
     while (pos < xmlString.length) {
-      const nextOpen = xmlString.indexOf(openBracket, pos);
+      nextOpen = xmlString.indexOf(openBracket, pos);
 
       // 1. HANDLE TEXT CONTENT (Preserving intentional spaces)
       if (nextOpen > pos || nextOpen === -1) {
